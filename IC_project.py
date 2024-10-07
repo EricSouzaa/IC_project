@@ -7,6 +7,10 @@ from matplotlib.colors import LinearSegmentedColormap
 
 def delta_met(data: pd.DataFrame, x_label: str, y_label: str, x_limits: float, y_limits: float, file_name: str,
               dpi: int, colors: list, colorbar_limits=(4500, 6000)):
+
+    if colors is None:
+        colors = ['#12355b', '#420039', '#d72638', '#ffffff', '#ff570a']
+
     df_El = data['Mg_trends'][0]
 
     x = df_El['Mg']
@@ -100,6 +104,6 @@ delta_met(
     y_limits=(-0.19, 0.19),
     file_name='figure_delta_Mg_Thiswork_close',
     dpi=500,
-    colors=tailwind_colors,
+    colors=None,
     colorbar_limits=(4500, 6000)
 )
