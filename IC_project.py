@@ -6,7 +6,7 @@ from matplotlib.colors import LinearSegmentedColormap
 
 
 def delta_met(data: pd.DataFrame, x_label: str, y_label: str, x_limits: float, y_limits: float, file_name: str,
-              dpi: int, colors:list , colorbar_limits=(4500, 6000)):
+              dpi: int, colors: list, colorbar_limits=(4500, 6000)):
     df_El = data['Mg_trends'][0]
 
     x = df_El['Mg']
@@ -16,9 +16,7 @@ def delta_met(data: pd.DataFrame, x_label: str, y_label: str, x_limits: float, y
     ccmap = LinearSegmentedColormap.from_list("custom_cmap", colors)
 
     plt.figure(1, figsize=(4, 4))
-    plt.subplots_adjust(left=0.2, right=0.8, bottom=0.1, top=0.9, wspace=0.2, hspace=0.0)
-
-    cmap = cm.get_cmap('Blues')
+    plt.subplots_adjust(left=0.17, right=0.8, bottom=0.1, top=0.95, wspace=0.2, hspace=0.0)
 
     ax1 = plt.subplot2grid((4, 1), (0, 0), rowspan=3)
     scatter = ax1.scatter(x, y, marker='o', c=cor, vmin=colorbar_limits[0], vmax=colorbar_limits[1],
@@ -28,9 +26,13 @@ def delta_met(data: pd.DataFrame, x_label: str, y_label: str, x_limits: float, y
 
     ax1.set_xlim(x_limits)
     ax1.set_ylim(y_limits)
-    ax1.set_ylabel(y_label, fontsize=6)
+    ax1.set_ylabel(y_label, fontsize=8)
+    ax1.tick_params(axis='both', labelsize=8)  # Set font size for x-axis
 
-    ax1.set_xticks(np.linspace(x_limits[0], x_limits[1], 5))
+    ax1.tick_params(axis='both', left=True, top=True, right=True, bottom=True, labelleft=True, labeltop=False,
+                    labelright=False, labelbottom=False)
+
+    # ax1.set_xticks(np.linspace(x_limits[0], x_limits[1], 5))
     ax1.tick_params(axis='x', which='minor', top=True, direction='in', size=1, width=0.5)
     ax1.tick_params(axis='y', which='minor', right=True, direction='in', size=1, width=0.5)
     ax1.tick_params(axis='x', which='major', top=True, direction='in', size=2, width=0.5)
@@ -44,20 +46,31 @@ def delta_met(data: pd.DataFrame, x_label: str, y_label: str, x_limits: float, y
     ax2.plot([x_limits[0], x_limits[1]], [0, 0], '--k', linewidth=0.4)
 
     ax2.set_xlim(x_limits)
-    ax2.set_ylim(-0.45, 0.4)
+    ax2.set_ylim(min(x - y) + min(x - y) * 0.2, max(x - y) + max(x - y) * 0.2)
 
-    ax2.set_yticks([0.4, 0.2, 0.0, -0.2, -0.4])
+    ax2.set_yticks([np.round(min(x - y), 2), 0, np.round(max(x - y), 2)])
+    ax2.tick_params(axis='both', labelsize=8)  # Set font size for both x and y axes
 
-    ax2.set_xlabel(x_label, fontsize=6)
-    ax2.set_ylabel(r'$\delta$($x-y$)', fontsize=6)
-    ax2.text(x_limits[0] + 0.01, 0.3,
-             r'$\delta$($x-y$) = ' + str(np.around(np.mean(x - y), 2)) + ' $\pm$ ' + str(np.around(np.std(x - y), 2)),
-             fontsize=4)
+    ax2.set_xlabel(x_label, fontsize=8)
+    ax2.set_ylabel(r'$\delta$($x-y$)', fontsize=8)
+    ax2.text(min(x_limits) - min(x_limits) * 0.1, max(x - y) - max(x - y) * 0.2,
+             r'$\delta$ = ' + str(np.around(np.mean(x - y), 2)) + ' $\pm$ ' + str(np.around(np.std(x - y), 2)),
+             fontsize=6)
 
-    cax = plt.axes([0.82, 0.5, 0.03, 0.4])
+    cax = plt.axes([0.82, 0.33, 0.03, 0.6])
     cbar = plt.colorbar(scatter, cax=cax)
-    cbar.set_label(r'$T_{\rm eff}$', fontsize=7)
+    cbar.set_label(r'$T_{\rm eff}$', fontsize=10)
     cbar.ax.tick_params(labelsize=6, size=2)
+
+    ax2.tick_params(axis='both', left=True, top=True, right=True, bottom=True, labelleft=True, labeltop=False,
+                    labelright=False, labelbottom=True)
+
+    # ax1.set_xticks(np.linspace(x_limits[0], x_limits[1], 5))
+    ax2.tick_params(axis='x', which='minor', top=True, direction='in', size=1, width=0.5)
+    ax2.tick_params(axis='y', which='minor', right=True, direction='in', size=1, width=0.5)
+    ax2.tick_params(axis='x', which='major', top=True, direction='in', size=2, width=0.5)
+    ax2.tick_params(axis='y', which='major', right=True, direction='in', size=2, width=0.5)
+    ax2.minorticks_on()
 
     plt.savefig(f'{file_name}.jpg', dpi=dpi)
     plt.savefig(f'{file_name}.pdf', dpi=dpi)
@@ -83,8 +96,8 @@ delta_met(
     data=df,
     x_label='[Mg/H] (This Work)',
     y_label='[Mg/H] (Syntspec DR17 NLTE)',
-    x_limits=(-0.4, 0.25),
-    y_limits=(-0.4, 0.25),
+    x_limits=(-0.19, 0.19),
+    y_limits=(-0.19, 0.19),
     file_name='figure_delta_Mg_Thiswork_close',
     dpi=500,
     colors=tailwind_colors,
