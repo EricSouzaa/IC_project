@@ -1,74 +1,92 @@
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import numpy as np
+import pandas as pd
+from matplotlib.colors import LinearSegmentedColormap
 
 
-def plot_delta_met(x, y, cor, xlim_min, xlim_max, ylim_min, ylim_max,
-                   xlabel='[Mg/H] (This Work)', ylabel1='[Mg/H] (Syntspec DR17 NLTE)', ylabel2=r'$\delta$($x-y$)',
-                   colorbar_label=r'$T_{\rm eff}$', cmap_name='Blues', filename='plot', dpi=300):
-    plt.figure(figsize=(6, 6))
+def delta_met(data: pd.DataFrame, x_label: str, y_label: str, x_limits: float, y_limits: float, file_name: str,
+              dpi: int, colors:list , colorbar_limits=(4500, 6000)):
+    df_El = data['Mg_trends'][0]
 
-    plt.subplots_adjust(left=0.2, right=0.9, bottom=0.13, top=0.91, wspace=0.05, hspace=0.2)
+    x = df_El['Mg']
+    y = df_El['Mg_H_raw_Syn_NLTE']
+    cor = df_El['Teff_raw_Syn_NLTE']
 
-    cmap = plt.get_cmap(cmap_name)
-    vmin, vmax = np.min(cor), np.max(cor)
+    ccmap = LinearSegmentedColormap.from_list("custom_cmap", colors)
 
-    plt.subplot2grid((2, 1), (0, 0))
-    sc = plt.scatter(x, y, marker='o', c=cor, vmin=vmin, vmax=vmax, cmap=cmap, edgecolor='k', alpha=0.9, s=20,
-                     linewidth=0.4)
-    plt.plot([-10000, 10000], [-10000, 10000], '--k', linewidth=0.4)
-    cbar = plt.colorbar(sc, shrink=0.95)
-    cbar.set_label(colorbar_label, fontsize=10)
-    cbar.ax.tick_params(labelsize=8, size=2)
+    plt.figure(1, figsize=(4, 4))
+    plt.subplots_adjust(left=0.2, right=0.8, bottom=0.1, top=0.9, wspace=0.2, hspace=0.0)
 
-    plt.xlim(xlim_min, xlim_max)
-    plt.ylim(ylim_min, ylim_max)
-    plt.ylabel(ylabel1, fontsize=8)
-    plt.xticks(np.linspace(xlim_min, xlim_max, num=6), fontsize=8)
-    plt.yticks(np.linspace(ylim_min, ylim_max, num=6), fontsize=8)
+    cmap = cm.get_cmap('Blues')
 
+    ax1 = plt.subplot2grid((4, 1), (0, 0), rowspan=3)
+    scatter = ax1.scatter(x, y, marker='o', c=cor, vmin=colorbar_limits[0], vmax=colorbar_limits[1],
+                          cmap=ccmap, edgecolor='k', alpha=0.9, s=20, linewidth=0.4)
 
-    plt.tick_params(axis='x', which='minor', top=True, direction='in', size=1, width=0.5)
-    plt.tick_params(axis='y', which='minor', right=True, direction='in', size=1, width=0.5)
-    plt.tick_params(axis='x', which='major', top=True, direction='in', size=2, width=0.5)
-    plt.tick_params(axis='y', which='major', right=True, direction='in', size=2, width=0.5)
-    plt.minorticks_on()
+    ax1.plot([x_limits[0], x_limits[1]], [x_limits[0], x_limits[1]], '--k', linewidth=0.4)
 
+    ax1.set_xlim(x_limits)
+    ax1.set_ylim(y_limits)
+    ax1.set_ylabel(y_label, fontsize=6)
 
-    plt.subplot2grid((2, 1), (1, 0))
-    sc2 = plt.scatter(x, x - y, marker='o', c=cor, vmin=vmin, vmax=vmax, cmap=cmap, edgecolor='k', alpha=0.9, s=20,
-                      linewidth=0.4)
-    plt.plot([-10000, 10000], [0, 0], '--k', linewidth=0.4)
+    ax1.set_xticks(np.linspace(x_limits[0], x_limits[1], 5))
+    ax1.tick_params(axis='x', which='minor', top=True, direction='in', size=1, width=0.5)
+    ax1.tick_params(axis='y', which='minor', right=True, direction='in', size=1, width=0.5)
+    ax1.tick_params(axis='x', which='major', top=True, direction='in', size=2, width=0.5)
+    ax1.tick_params(axis='y', which='major', right=True, direction='in', size=2, width=0.5)
+    ax1.minorticks_on()
 
-    plt.xlim(xlim_min, xlim_max)
-    plt.ylim(-0.5, 0.5)
-    plt.xlabel(xlabel, fontsize=8)
-    plt.ylabel(ylabel2, fontsize=8)
+    ax2 = plt.subplot2grid((4, 1), (3, 0))
+    ax2.scatter(x, x - y, marker='o', c=cor, vmin=colorbar_limits[0], vmax=colorbar_limits[1],
+                cmap=ccmap, edgecolor='k', alpha=0.9, s=20, linewidth=0.4)
 
-    plt.text(xlim_min + 0.01, 0.3, r'$\delta$($x-y$) = ' + str(np.around(np.mean(x - y), 2)) +
-             ' $\pm$ ' + str(np.around(np.std(x - y), 2)), fontsize=6)
+    ax2.plot([x_limits[0], x_limits[1]], [0, 0], '--k', linewidth=0.4)
 
-    plt.xticks(np.linspace(xlim_min, xlim_max, num=6), fontsize=8)
-    plt.yticks(np.linspace(-0.5, 0.5, num=5), fontsize=8)
+    ax2.set_xlim(x_limits)
+    ax2.set_ylim(-0.45, 0.4)
 
+    ax2.set_yticks([0.4, 0.2, 0.0, -0.2, -0.4])
 
-    plt.tick_params(axis='x', which='minor', top=True, direction='in', size=1, width=0.5)
-    plt.tick_params(axis='y', which='minor', right=True, direction='in', size=1, width=0.5)
-    plt.tick_params(axis='x', which='major', top=True, direction='in', size=2, width=0.5)
-    plt.tick_params(axis='y', which='major', right=True, direction='in', size=2, width=0.5)
-    plt.minorticks_on()
+    ax2.set_xlabel(x_label, fontsize=6)
+    ax2.set_ylabel(r'$\delta$($x-y$)', fontsize=6)
+    ax2.text(x_limits[0] + 0.01, 0.3,
+             r'$\delta$($x-y$) = ' + str(np.around(np.mean(x - y), 2)) + ' $\pm$ ' + str(np.around(np.std(x - y), 2)),
+             fontsize=4)
 
+    cax = plt.axes([0.82, 0.5, 0.03, 0.4])
+    cbar = plt.colorbar(scatter, cax=cax)
+    cbar.set_label(r'$T_{\rm eff}$', fontsize=7)
+    cbar.ax.tick_params(labelsize=6, size=2)
 
-    plt.savefig(f'{filename}.pdf', dpi=dpi, format='pdf', bbox_inches='tight')
-    plt.savefig(f'{filename}.jpg', dpi=dpi, format='jpg', bbox_inches='tight')
-
-    plt.show()
+    plt.savefig(f'{file_name}.jpg', dpi=dpi)
+    plt.savefig(f'{file_name}.pdf', dpi=dpi)
+    plt.clf()
 
 
-# Exemplo de uso
-x_data = np.random.uniform(-0.4, 0.25, 100)
-y_data = np.random.uniform(-0.4, 0.25, 100)
-temperature_data = np.random.uniform(4500, 6000, 100)
+####### DADOS ALEATÓRIOS PARA TESTE #######
+np.random.seed(42)
+num_points = 100
+data = {
+    'Mg_trends': [{
+        'Mg': np.random.uniform(-0.1, 0.1, num_points),
+        'Mg_H_raw_Syn_NLTE': np.random.uniform(-0.1, 0.1, num_points),
+        'Teff_raw_Syn_NLTE': np.random.uniform(4600, 6000, num_points)
+    }]
+}
+df = pd.DataFrame(data)
+####### DADOS ALEATÓRIOS PARA TESTE #######
 
-plot_delta_met(x_data, y_data, temperature_data, xlim_min=-0.4, xlim_max=0.25, ylim_min=-0.4, ylim_max=0.25,
-               xlabel='X Axis Label', ylabel1='Y Axis Label', filename='my_plot', dpi=300)
+tailwind_colors = ['#7192B1', '#5C5830', '#A49042', '#978C29', '#A34E33']
 
+delta_met(
+    data=df,
+    x_label='[Mg/H] (This Work)',
+    y_label='[Mg/H] (Syntspec DR17 NLTE)',
+    x_limits=(-0.4, 0.25),
+    y_limits=(-0.4, 0.25),
+    file_name='figure_delta_Mg_Thiswork_close',
+    dpi=500,
+    colors=tailwind_colors,
+    colorbar_limits=(4500, 6000)
+)
