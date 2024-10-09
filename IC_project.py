@@ -6,18 +6,22 @@ from matplotlib.colors import LinearSegmentedColormap
 
 
 def delta_met(data: pd.DataFrame, x_label: str, y_label: str, colorbar_label: str, x_limits: float, y_limits: float, file_name: str,
-              dpi: int, colors: list, colorbar_limits=(4500, 6000)):
+              dpi: int, colors=None, x_axis: str = 'default_x', y_axis: str = 'default_y', color_axis: str = 'default_color', colorbar_limits=(4500, 6000)):
 
-    if colors is None:
-        colors = ['#12355b', '#420039', '#d72638', '#ffffff', '#ff570a']
+    if isinstance(colors, str):
+        ccmap = plt.get_cmap(colors)
+    else:
+        if colors is None:
+            colors = ['#12355b', '#420039', '#d72638', '#ffffff', '#ff570a']
+        ccmap = LinearSegmentedColormap.from_list("custom_cmap", colors)
+
 
     df_El = data['Mg_trends'][0]
 
-    x = df_El['Mg']
-    y = df_El['Mg_H_raw_Syn_NLTE']
-    cor = df_El['Teff_raw_Syn_NLTE']
+    x = df_El[x_axis]
+    y = df_El[y_axis]
+    cor = df_El[color_axis]
 
-    ccmap = LinearSegmentedColormap.from_list("custom_cmap", colors)
 
     plt.figure(1, figsize=(4, 4))
     plt.subplots_adjust(left=0.17, right=0.8, bottom=0.1, top=0.95, wspace=0.2, hspace=0.0)
@@ -103,6 +107,9 @@ delta_met(
     y_limits=(-0.19, 0.19),
     file_name='figure_delta_Mg_Thiswork_close',
     dpi=500,
-    colors=tailwind_colors,
+    colors='viridis',
+    x_axis='Mg',
+    y_axis='Mg_H_raw_Syn_NLTE',
+    color_axis='Teff_raw_Syn_NLTE',
     colorbar_limits=(1, 6000)
 )
