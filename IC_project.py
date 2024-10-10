@@ -6,7 +6,7 @@ from matplotlib.colors import LinearSegmentedColormap
 
 
 def delta_met(data: pd.DataFrame, x_label: str, y_label: str, colorbar_label: str, x_limits: float, y_limits: float, file_name: str,
-              dpi: int, colors=None, x_axis: str = 'default_x', y_axis: str = 'default_y', color_axis: str = 'default_color', colorbar_limits=(4500, 6000)):
+              dpi: int, colors=None, data_axis: str = 'default_data', x_axis: str = 'default_x', y_axis: str = 'default_y', color_axis: str = 'default_color', colorbar_limits=(4500, 6000)):
 
     if isinstance(colors, str):
         ccmap = plt.get_cmap(colors)
@@ -16,7 +16,7 @@ def delta_met(data: pd.DataFrame, x_label: str, y_label: str, colorbar_label: st
         ccmap = LinearSegmentedColormap.from_list("custom_cmap", colors)
 
 
-    df_El = data['Mg_trends'][0]
+    df_El = data[data_axis][0]
 
     x = df_El[x_axis]
     y = df_El[y_axis]
@@ -108,6 +108,7 @@ delta_met(
     file_name='figure_delta_Mg_Thiswork_close',
     dpi=500,
     colors='viridis',
+    data_axis='Mg_trends',
     x_axis='Mg',
     y_axis='Mg_H_raw_Syn_NLTE',
     color_axis='Teff_raw_Syn_NLTE',
