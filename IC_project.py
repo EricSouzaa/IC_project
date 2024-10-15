@@ -15,13 +15,17 @@ def delta_met(data: pd.DataFrame, x_label: str, y_label: str, colorbar_label: st
             colors = ['#12355b', '#420039', '#d72638', '#ffffff', '#ff570a']
         ccmap = LinearSegmentedColormap.from_list("custom_cmap", colors)
 
+    if data_axis != 'default_data':
+        df_El = data[data_axis][0]
+    else:
+        df_El = data
 
-    df_El = data[data_axis][0]
+    if x_axis not in df_El.columns or y_axis not in df_El.columns or color_axis not in df_El.columns:
+        raise ValueError("Uma ou mais colunas especificadas não existem no dataframe!")
 
     x = df_El[x_axis]
     y = df_El[y_axis]
     cor = df_El[color_axis]
-
 
     plt.figure(1, figsize=(4, 4))
     plt.subplots_adjust(left=0.17, right=0.8, bottom=0.1, top=0.95, wspace=0.2, hspace=0.0)
@@ -83,20 +87,9 @@ def delta_met(data: pd.DataFrame, x_label: str, y_label: str, colorbar_label: st
     plt.clf()
 
 
-####### DADOS ALEATÓRIOS PARA TESTE #######
-np.random.seed(42)
-num_points = 100
-data = {
-    'Mg_trends': [{
-        'Mg': np.random.uniform(-0.1,0.1, num_points),
-        'Mg_H_raw_Syn_NLTE': np.random.uniform(-0.5,0.5, num_points),
-        'Teff_raw_Syn_NLTE': np.random.uniform(4600, 6000, num_points)
-    }]
-}
-df = pd.DataFrame(data)
-####### DADOS ALEATÓRIOS PARA TESTE #######
 
-tailwind_colors = ['#7192B1', '#5C5830', '#A49042', '#978C29', '#A34E33']
+df = pd.read_excel('/home/diogo/Downloads/IC_project-main/M67 paper II data d_new_31_05_2018_NoBE.xlsx')
+print(df)
 
 delta_met(
     data=df,
@@ -108,9 +101,11 @@ delta_met(
     file_name='figure_delta_Mg_Thiswork_close',
     dpi=500,
     colors='viridis',
-    data_axis='Mg_trends',
-    x_axis='Mg',
-    y_axis='Mg_H_raw_Syn_NLTE',
-    color_axis='Teff_raw_Syn_NLTE',
+    data_axis='d_new_31_05_2018_NoBE',
+    x_axis='ra',
+    y_axis='dec',
+    color_axis='SNR',
     colorbar_limits=(1, 6000)
 )
+
+
